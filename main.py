@@ -93,6 +93,14 @@ class Custom3dView:
 
         # add combo for colour channel
         self._channel = gui.Combobox()
+        self.channel_name = ["Red", "Green", "Blue"]
+        self._channel.add_item(self.channel_name[0])
+        self._channel.add_item(self.channel_name[1])
+        self._channel.add_item(self.channel_name[2])
+        self._channel.set_on_selection_changed(self._on_channel)
+
+        # disable combo
+        self._channel.enabled = False
 
         combo_channel = gui.Horiz(0, gui.Margins(0.25 * em, 0.25 * em, 0.25 * em, 0.25 * em))
         combo_channel.add_child(gui.Label("RGB Channel"))
@@ -100,6 +108,15 @@ class Custom3dView:
 
         # add combo for voxel size
         self._voxel = gui.Combobox()
+        self.voxel_name = ["2", "5", "10", "20"]
+        self._voxel.add_item(self.voxel_name[0])
+        self._voxel.add_item(self.voxel_name[1])
+        self._voxel.add_item(self.voxel_name[2])
+        self._voxel.add_item(self.voxel_name[3])
+        self._voxel.set_on_selection_changed(self._on_voxel)
+
+        # disable combo
+        self._voxel.enabled = False
 
         combo_voxel = gui.Horiz(0, gui.Margins(0.25 * em, 0.25 * em, 0.25 * em, 0.25 * em))
         combo_voxel.add_child(gui.Label("Size of voxels"))
@@ -233,18 +250,9 @@ class Custom3dView:
 
         self.widget3d.force_redraw()
 
-        self.voxel_name = ["2", "5", "10", "20"]
-        self._voxel.add_item(self.voxel_name[0])
-        self._voxel.add_item(self.voxel_name[1])
-        self._voxel.add_item(self.voxel_name[2])
-        self._voxel.add_item(self.voxel_name[3])
-        self._voxel.set_on_selection_changed(self._on_voxel)
-
-        self.channel_name = ["Red", "Green", "Blue"]
-        self._channel.add_item(self.channel_name[0])
-        self._channel.add_item(self.channel_name[1])
-        self._channel.add_item(self.channel_name[2])
-        self._channel.set_on_selection_changed(self._on_channel)
+        # enable comboboxes
+        self._voxel.enabled = True
+        self._channel.enabled = True
 
         # adapt temp edit limits
         self.edit_max.set_limits(0, 255)
