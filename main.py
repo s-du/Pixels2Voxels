@@ -390,7 +390,7 @@ class Custom3dView:
         center = bounds.get_center()
         self.widget3d.setup_camera(30, bounds, center)
         camera = self.widget3d.scene.camera
-        self.widget3d.look_at(center, center + [0, 0, 1200], [0, -1, 0])
+        self.widget3d.look_at(center, center + [0, 0, 2000], [0, -1, 0])
 
     def _on_mouse_widget3d(self, event):
         # We could override BUTTON_DOWN without a modifier, but that would
@@ -498,6 +498,7 @@ def surface_from_image(data):
         x = -x_coords.flatten()
         y = y_coords.flatten()
         z = chan.flatten()
+        z = [i * 3 for i in z]
 
         # Create the point cloud using the flattened arrays
         # compute how the range scales compared to x/y
