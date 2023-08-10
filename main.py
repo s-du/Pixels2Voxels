@@ -114,7 +114,7 @@ class Custom3dView:
 
         # add combo for voxel size
         self._voxel = gui.Combobox()
-        self.voxel_name = ["3", "10", "20"]
+        self.voxel_name = ["2", "6", "15"]
         self._voxel.add_item(self.voxel_name[0])
         self._voxel.add_item(self.voxel_name[1])
         self._voxel.add_item(self.voxel_name[2])
@@ -184,15 +184,33 @@ class Custom3dView:
 
 
     def _on_reset_filter(self):
-        self.voxel_grids = []
-        for size in self.voxel_size:
-            voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pc_channel, voxel_size=size)
-            self.voxel_grids.append(voxel_grid)
+        self.min_value = 0
+        self.max_value = 255
 
+        # create all voxel plots
+        for i in range(3):
+            voxel_grids = []
+            pc_active = self.pc_channels[i]
+            for size in self.voxel_size:
+                voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pc_active,
+                                                                            voxel_size=size)
+                voxel_grids.append(voxel_grid)
+                print('done...')
+
+            self.mega_grid.append(voxel_grids)
+
+        print('new vox ok')
         # show one geometry
         self.widget3d.scene.clear_geometry()
-        self.widget3d.scene.add_geometry(f"PC {self.current_index}", self.voxel_grids[self.current_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}",
+                                         self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
+
+        # set max values
+        self.edit_max.set_limits(0, 255)
+        self.edit_min.set_limits(0, 255)
+
+
 
     def clear_all(self):
         self.current_vox_index = 0
@@ -255,7 +273,7 @@ class Custom3dView:
 
         # create all voxel grids
         self.mega_grid = []
-        self.voxel_size = [5, 10, 20]
+        self.voxel_size = [2, 6, 15]
 
         # create all voxel plots
         for i in range(3):
@@ -305,7 +323,7 @@ class Custom3dView:
         crop_box = crop_box.create_from_points(points)
 
         self.mega_grid = []
-        self.voxel_size = [3, 10, 20]
+        self.voxel_size = [2, 6, 15]
 
         # create all voxel plots
         for i in range(3):
@@ -327,7 +345,7 @@ class Custom3dView:
         self.widget3d.force_redraw()
 
         # set max values
-        self.edit_max.set_limits(self.min_value, self.max_value)
+        self.edit_max.set_limits(0, self.max_value)
 
     def _on_edit_max(self, value):
         self.max_value = value
@@ -345,7 +363,7 @@ class Custom3dView:
         crop_box = crop_box.create_from_points(points)
 
         self.mega_grid = []
-        self.voxel_size = [3, 10, 20]
+        self.voxel_size = [2, 6, 15]
 
         # create all voxel plots
         for i in range(3):
@@ -368,7 +386,7 @@ class Custom3dView:
         self.widget3d.force_redraw()
 
         # set max values
-        self.edit_max.set_limits(self.min_value, self.max_value)
+        self.edit_max.set_limits(self.min_value, 255)
 
     def _on_layout(self, layout_context):
         r = self.window.content_rect
