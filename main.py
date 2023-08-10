@@ -46,6 +46,9 @@ class Custom3dView:
         self.mat_maxi.shader = "defaultUnlit"
         self.mat_maxi.point_size = 15 * self.window.scaling
 
+        self.current_vox_index = 0
+        self.current_chan_index = 0
+
         # layout
         self.create_layout()
 
@@ -75,7 +78,7 @@ class Custom3dView:
         camera_but = gui.Button('Reset view')
         camera_but.set_on_clicked(self._on_reset_camera)
 
-        filter_but = gui.Button('Reset temp. filter')
+        filter_but = gui.Button('Reset intensity filter')
         filter_but.set_on_clicked(self._on_reset_filter)
 
         # add combo for lit/unlit/depth
@@ -108,11 +111,10 @@ class Custom3dView:
 
         # add combo for voxel size
         self._voxel = gui.Combobox()
-        self.voxel_name = ["2", "5", "10", "20"]
+        self.voxel_name = ["5", "10", "20"]
         self._voxel.add_item(self.voxel_name[0])
         self._voxel.add_item(self.voxel_name[1])
         self._voxel.add_item(self.voxel_name[2])
-        self._voxel.add_item(self.voxel_name[3])
         self._voxel.set_on_selection_changed(self._on_voxel)
 
         # disable combo
@@ -236,17 +238,25 @@ class Custom3dView:
         self.max_value = 255
 
         # create all voxel grids
-        self.voxel_grids = []
-        self.voxel_size = [2, 5, 10, 20]
+        self.mega_grid = []
+        self.voxel_size = [5, 10, 20]
 
-        for size in self.voxel_size:
-            voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pc_active,
-                                                                        voxel_size=size)
-            self.voxel_grids.append(voxel_grid)
+        # create all voxel plots
+        for i in range(3):
+            voxel_grids = []
+            pc_active = self.pc_channels[i]
+            for size in self.voxel_size:
+                voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pc_active,
+                                                                            voxel_size=size)
+                voxel_grids.append(voxel_grid)
+                print('done...')
+
+            self.mega_grid.append(voxel_grids)
+
 
         # show one geometry
-        self.widget3d.scene.add_geometry('PC 2', self.voxel_grids[2], self.mat)
-        self.current_index = 2
+        self.widget3d.scene.add_geometry('PC 2', self.mega_grid[0][2], self.mat)
+        self.current_vox_index = 2
 
         self.widget3d.force_redraw()
 
@@ -342,30 +352,23 @@ class Custom3dView:
                                    pref.height)
 
     def _on_voxel(self, name, index):
-        print('ok!')
-        old_name = f"PC {self.current_index}"
+        old_name = f"PC {self.current_vox_index}"
         print(old_name)
         self.widget3d.scene.remove_geometry(old_name)
-        self.widget3d.scene.add_geometry(f"PC {index}", self.voxel_grids[index], self.mat)
-        self.current_index = index
+        self.widget3d.scene.add_geometry(f"PC {index}", self.mega_grid[self.current_chan_index][index], self.mat)
+        self.current_vox_index = index
 
         self.widget3d.force_redraw()
 
     def _on_channel(self, name, index):
         # change active pointcloud
+        self.current_chan_index = index
         self.pc_active = self.pc_channels[index]
 
-        self.voxel_grids = []
-
-        for size in self.voxel_size:
-            voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pc_active,
-                                                                        voxel_size=size)
-            self.voxel_grids.append(voxel_grid)
-
         # show one geometry
-        old_name = f"PC {self.current_index}"
+        old_name = f"PC {self.current_vox_index}"
         self.widget3d.scene.remove_geometry(old_name)
-        self.widget3d.scene.add_geometry(f"PC {self.current_index}", self.voxel_grids[self.current_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}", self.mega_grid[index][self.current_vox_index], self.mat)
 
         self.widget3d.force_redraw()
 
