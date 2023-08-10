@@ -67,7 +67,7 @@ class Custom3dView:
         self.load_but = gui.Button('Choose image')
         self.load_but.set_on_clicked(self._on_button_load)
 
-        img_path = res.find('img/miniature4.png')
+        img_path = res.find('img/miniature.png')
         self.img_thumb = gui.ImageWidget(img_path)
         self.button_lay.add_child(self.img_thumb)
 
