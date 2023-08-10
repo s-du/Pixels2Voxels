@@ -191,7 +191,19 @@ class Custom3dView:
         self.widget3d.scene.add_geometry(f"PC {self.current_index}", self.voxel_grids[self.current_index], self.mat)
         self.widget3d.force_redraw()
 
+    def clear_all(self):
+        self.current_vox_index = 0
+        self.current_chan_index = 0
+        self.min_value = 0
+        self.max_value = 255
+        self.mega_grid = []
+        old_name = f"PC {self.current_vox_index}"
+        self.widget3d.scene.remove_geometry(old_name)
+
     def load(self, img_path):
+        # clear all data
+        self.clear_all()
+
         # Open the image using PIL
         image = Image.open(img_path)
         print('Image successfully loaded')
