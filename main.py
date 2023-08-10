@@ -8,6 +8,9 @@ import numpy as np
 
 from PIL import Image
 
+# Parameters
+Z_FACTOR=3
+
 #custom libraries
 import resources as res
 
@@ -111,7 +114,7 @@ class Custom3dView:
 
         # add combo for voxel size
         self._voxel = gui.Combobox()
-        self.voxel_name = ["5", "10", "20"]
+        self.voxel_name = ["3", "10", "20"]
         self._voxel.add_item(self.voxel_name[0])
         self._voxel.add_item(self.voxel_name[1])
         self._voxel.add_item(self.voxel_name[2])
@@ -210,7 +213,7 @@ class Custom3dView:
 
         # resize image for performance
         # Define the desired fixed width
-        fixed_width = 1920  # Replace with your desired width in pixels
+        fixed_width = 1000  # Replace with your desired width in pixels
 
         # Calculate the corresponding height to maintain the original aspect ratio
         original_width, original_height = image.size
@@ -249,6 +252,7 @@ class Custom3dView:
         self.min_value = 0
         self.max_value = 255
 
+
         # create all voxel grids
         self.mega_grid = []
         self.voxel_size = [5, 10, 20]
@@ -267,8 +271,8 @@ class Custom3dView:
 
 
         # show one geometry
-        self.widget3d.scene.add_geometry('PC 2', self.mega_grid[0][2], self.mat)
-        self.current_vox_index = 2
+        self.widget3d.scene.add_geometry('PC 0', self.mega_grid[0][0], self.mat)
+        self.current_vox_index = 0
 
         self.widget3d.force_redraw()
 
@@ -289,7 +293,6 @@ class Custom3dView:
 
     def _on_edit_min(self, value):
         self.min_value = value
-        self.voxel_grids = []
         # crop point cloud
         pt1 = self.pt1
         pt1[2] = value
@@ -301,22 +304,33 @@ class Custom3dView:
         crop_box = o3d.geometry.AxisAlignedBoundingBox
         crop_box = crop_box.create_from_points(points)
 
-        point_cloud_crop = self.pc_channel.crop(crop_box)
-        for size in self.voxel_size:
-            voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(point_cloud_crop,voxel_size=size)
-            self.voxel_grids.append(voxel_grid)
+        self.mega_grid = []
+        self.voxel_size = [3, 10, 20]
 
+        # create all voxel plots
+        for i in range(3):
+            voxel_grids = []
+            pc_active = self.pc_channels[i]
+            point_cloud_crop = pc_active.crop(crop_box)
+            for size in self.voxel_size:
+                voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(point_cloud_crop,
+                                                                            voxel_size=size)
+                voxel_grids.append(voxel_grid)
+                print('done...')
+
+            self.mega_grid.append(voxel_grids)
+
+        print('new vox ok')
         # show one geometry
         self.widget3d.scene.clear_geometry()
-        self.widget3d.scene.add_geometry(f"PC {self.current_index}", self.voxel_grids[self.current_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}", self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
 
         # set max values
-        self.edit_max.set_limits(self.min_value, self.tmax)
+        self.edit_max.set_limits(self.min_value, self.max_value)
 
     def _on_edit_max(self, value):
         self.max_value = value
-        self.voxel_grids = []
 
         # crop point cloud
         pt1 = self.pt1
@@ -330,19 +344,31 @@ class Custom3dView:
         crop_box = o3d.geometry.AxisAlignedBoundingBox
         crop_box = crop_box.create_from_points(points)
 
-        point_cloud_crop = self.pc_channel.crop(crop_box)
+        self.mega_grid = []
+        self.voxel_size = [3, 10, 20]
 
-        for size in self.voxel_size:
-            voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(point_cloud_crop,voxel_size=size)
-            self.voxel_grids.append(voxel_grid)
+        # create all voxel plots
+        for i in range(3):
+            voxel_grids = []
+            pc_active = self.pc_channels[i]
+            point_cloud_crop = pc_active.crop(crop_box)
+            for size in self.voxel_size:
+                voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(point_cloud_crop,
+                                                                            voxel_size=size)
+                voxel_grids.append(voxel_grid)
+                print('done...')
 
+            self.mega_grid.append(voxel_grids)
+
+        print('new vox ok')
         # show one geometry
         self.widget3d.scene.clear_geometry()
-        self.widget3d.scene.add_geometry(f"PC {self.current_index}", self.voxel_grids[self.current_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}",
+                                         self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
 
         # set max values
-        self.edit_min.set_limits(self.tmin, self.max_value)
+        self.edit_max.set_limits(self.min_value, self.max_value)
 
     def _on_layout(self, layout_context):
         r = self.window.content_rect
@@ -402,7 +428,7 @@ class Custom3dView:
         center = bounds.get_center()
         self.widget3d.setup_camera(30, bounds, center)
         camera = self.widget3d.scene.camera
-        self.widget3d.look_at(center, center + [0, 0, 2000], [0, -1, 0])
+        self.widget3d.look_at(center, center + [0, 0, 3000], [0, -1, 0])
 
     def _on_mouse_widget3d(self, event):
         # We could override BUTTON_DOWN without a modifier, but that would
@@ -510,7 +536,7 @@ def surface_from_image(data):
         x = -x_coords.flatten()
         y = y_coords.flatten()
         z = chan.flatten()
-        z = [i * 3 for i in z]
+       # z = [i * Z_FACTOR for i in z]
 
         # Create the point cloud using the flattened arrays
         # compute how the range scales compared to x/y
