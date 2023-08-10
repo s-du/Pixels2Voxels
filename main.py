@@ -517,13 +517,15 @@ def surface_from_image(data):
     channels = [red_channel, green_channel, blue_channel]
     pcds = []
 
-    for chan in channels:
+    for i,chan in enumerate(channels):
         color_array = np.zeros((chan.shape[0], chan.shape[1], 3), dtype=np.float32)
 
         # Assign the red channel's intensity values to all three channels
-        color_array[:, :, 0] = chan/255
-        color_array[:, :, 1] = chan/255
-        color_array[:, :, 2] = chan/255
+        color_array[:, :, 0] = 0.2*chan/255
+        color_array[:, :, 1] = 0.2*chan/255
+        color_array[:, :, 2] = 0.2*chan/255
+
+        color_array[:, :, i] = 0.6*chan/255
 
         # color_array = np.transpose(color_array, (1, 0, 2))
         print(color_array.shape)
