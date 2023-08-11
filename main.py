@@ -187,6 +187,10 @@ class Custom3dView:
         self.min_value = 0
         self.max_value = 255
 
+        # set max values
+        self.edit_max.set_limits(0, 255)
+        self.edit_min.set_limits(0, 255)
+
         # create all voxel plots
         for i in range(3):
             voxel_grids = []
@@ -206,20 +210,16 @@ class Custom3dView:
                                          self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
 
-        # set max values
-        self.edit_max.set_limits(0, 255)
-        self.edit_min.set_limits(0, 255)
-
-
 
     def clear_all(self):
-        self.current_vox_index = 0
-        self.current_chan_index = 0
         self.min_value = 0
         self.max_value = 255
         self.mega_grid = []
         old_name = f"PC {self.current_vox_index}"
         self.widget3d.scene.remove_geometry(old_name)
+
+        self.current_vox_index = 0
+        self.current_chan_index = 0
 
     def load(self, img_path):
         # clear all data
