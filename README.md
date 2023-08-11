@@ -22,7 +22,13 @@ Then, the point cloud is converted into a voxel grid, using Open3D library.
 <p align="center">
     <a><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGdtbGRtdG1jeXJtbzY3ZmlpZHA2NTVsMGllZHRvM3dteXlqM3c4NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zi4qX6gbVYSRXPxQVp/giphy.gif" alt="pix2vox-principle" border="0"></a>
     
-    Plotting color channels as 'voxel' maps
+    3d movement around the voxel grid (blue channel)
+</p>
+
+<p align="center">
+    <a><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDN2NHhyZTY1dTF6ZWNidXVnMmtiOHBvZ2diMGppZ3h0Mmd2MTVzMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IgBbLq5An1ajtv3AdP/giphy.gif" alt="pix2vox-principle" border="0"></a>
+    
+    Changing voxel size
 </p>
 
 
