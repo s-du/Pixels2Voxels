@@ -4,6 +4,7 @@
 
 ## Introduction
 Pixels-2-Voxels is a simple Open3d-based application for visualizing the three color channels of any image as 3d plots. It uses a 'voxel' representation, created from the input data. Some simple filtering algorithms are also implemented. 
+It's of no use, so it's absolutely essential!
 
 **The project is still in pre-release, so do not hesitate to send your recommendations or the bugs you encountered!**
 
