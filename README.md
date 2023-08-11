@@ -7,7 +7,10 @@ Pixels-2-Voxels is a simple Open3d-based application for visualizing the three c
 
 It's of no use, so it's absolutely essential!
 
+\#Pillow \#Open3D \#Voxels \#ImageProcessing #\Pointcloud 
+
 **The project is still in pre-release, so do not hesitate to send your recommendations or the bugs you encountered!**
+
 
 <p align="center">
     <a href="https://ibb.co/j8QjMmz"><img src="https://i.ibb.co/vcTMPph/pix2vox-principle.png" alt="pix2vox-principle" border="0"></a>
