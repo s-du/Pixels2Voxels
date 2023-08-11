@@ -19,6 +19,13 @@ The application allows to process any JPG/PNG picture and separates the three co
 It reads the embedded intensity values (for each pixel) and converts them into point cloud format (x and y coordinates correspond to the pixel location and the z coordinate is the intensity from 0 to 255).
 Then, the point cloud is converted into a voxel grid, using Open3D library. 
 
+<p align="center">
+    <a><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGdtbGRtdG1jeXJtbzY3ZmlpZHA2NTVsMGllZHRvM3dteXlqM3c4NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zi4qX6gbVYSRXPxQVp/giphy.gif" alt="pix2vox-principle" border="0"></a>
+    
+    Plotting color channels as 'voxel' maps
+</p>
+
+
 
 ## Installation instructions
 
