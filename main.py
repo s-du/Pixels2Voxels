@@ -9,10 +9,11 @@ import numpy as np
 from PIL import Image
 
 # Parameters
-Z_FACTOR=3
+Z_FACTOR = 3
 
-#custom libraries
+# custom libraries
 import resources as res
+
 
 class Custom3dView:
     def __init__(self):
@@ -57,7 +58,6 @@ class Custom3dView:
 
         # default autorescale on
         self.auto_rescale = True
-
 
     def create_layout(self):
         # LAYOUT GUI ELEMENTS
@@ -123,13 +123,16 @@ class Custom3dView:
         # disable combo
         self._voxel.enabled = False
 
+
         combo_voxel = gui.Horiz(0, gui.Margins(0.25 * em, 0.25 * em, 0.25 * em, 0.25 * em))
         combo_voxel.add_child(gui.Label("Size of voxels"))
         combo_voxel.add_child(self._voxel)
 
         # add editor for max temp
-        self.edit_max = gui.Slider(gui.Slider.DOUBLE)
-        self.edit_min = gui.Slider(gui.Slider.DOUBLE)
+        self.edit_max = gui.NumberEdit(gui.NumberEdit.INT)
+        self.edit_min = gui.NumberEdit(gui.NumberEdit.INT)
+        self.edit_max.enabled = False
+        self.edit_min.enabled = False
 
         numlayout_max = gui.Horiz()
         numlayout_max.add_child(gui.Label("Max. intensity.:"))
@@ -157,10 +160,8 @@ class Custom3dView:
         self.widget3d.set_on_mouse(self._on_mouse_widget3d)
         self.window.set_needs_layout()
 
-
     def choose_material(self, is_enabled):
         pass
-
 
     def _on_button_load(self):
         # choose file
@@ -182,14 +183,17 @@ class Custom3dView:
     def _on_load_dialog_cancel(self):
         self.window.close_dialog()
 
-
     def _on_reset_filter(self):
         self.min_value = 0
         self.max_value = 255
 
         # set max values
         self.edit_max.set_limits(0, 255)
+        self.edit_max.set_value(255)
         self.edit_min.set_limits(0, 255)
+        self.edit_min.set_value(0)
+
+        self.mega_grid = []
 
         # create all voxel plots
         for i in range(3):
@@ -209,7 +213,6 @@ class Custom3dView:
         self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}",
                                          self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
-
 
     def clear_all(self):
         self.min_value = 0
@@ -253,7 +256,7 @@ class Custom3dView:
         # separate each channel as an individual array
         print('Lauching image-to-cloud')
         self.pc_channels = surface_from_image(image_array)
-        self.pc_active = self.pc_channels[0] # Red channel by default
+        self.pc_active = self.pc_channels[0]  # Red channel by default
 
         # store basic properties
         bound = self.pc_active.get_axis_aligned_bounding_box()
@@ -269,7 +272,6 @@ class Custom3dView:
 
         self.min_value = 0
         self.max_value = 255
-
 
         # create all voxel grids
         self.mega_grid = []
@@ -287,7 +289,6 @@ class Custom3dView:
 
             self.mega_grid.append(voxel_grids)
 
-
         # show one geometry
         self.widget3d.scene.add_geometry('PC 0', self.mega_grid[0][0], self.mat)
         self.current_vox_index = 0
@@ -297,15 +298,19 @@ class Custom3dView:
         # enable comboboxes
         self._voxel.enabled = True
         self._channel.enabled = True
+        self.edit_max.enabled = True
+        self.edit_min.enabled = True
 
         # adapt temp edit limits
         self.edit_max.set_limits(0, 255)
+        self.edit_max.set_value(0)
+
         self.edit_max.set_on_value_changed(self._on_edit_max)
-        self.edit_max.double_value = 255
 
         self.edit_min.set_limits(0, 255)
+        self.edit_max.set_value(255)
         self.edit_min.set_on_value_changed(self._on_edit_min)
-        self.edit_min.double_value = 0
+
 
         self._on_reset_camera()
 
@@ -341,7 +346,8 @@ class Custom3dView:
         print('new vox ok')
         # show one geometry
         self.widget3d.scene.clear_geometry()
-        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}", self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}",
+                                         self.mega_grid[self.current_chan_index][self.current_vox_index], self.mat)
         self.widget3d.force_redraw()
 
         # set max values
@@ -357,7 +363,7 @@ class Custom3dView:
         pt2[2] = value
         np_points = [pt1, pt2]
         points = o3d.utility.Vector3dVector(np_points)
-        print(pt1,pt2)
+        print(pt1, pt2)
 
         crop_box = o3d.geometry.AxisAlignedBoundingBox
         crop_box = crop_box.create_from_points(points)
@@ -424,10 +430,10 @@ class Custom3dView:
         # show one geometry
         old_name = f"PC {self.current_vox_index}"
         self.widget3d.scene.remove_geometry(old_name)
-        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}", self.mega_grid[index][self.current_vox_index], self.mat)
+        self.widget3d.scene.add_geometry(f"PC {self.current_vox_index}", self.mega_grid[index][self.current_vox_index],
+                                         self.mat)
 
         self.widget3d.force_redraw()
-
 
     def _on_shader(self, name, index):
         material = self.materials[index]
@@ -517,7 +523,8 @@ def filter_point_cloud_by_intensity(point_cloud, lower_threshold, upper_threshol
     print(intensity_values)
 
     # Find the indices of points with intensity within the desired range
-    valid_indices = np.where(np.logical_and(intensity_values >= lower_threshold, intensity_values <= upper_threshold))[0]
+    valid_indices = np.where(np.logical_and(intensity_values >= lower_threshold, intensity_values <= upper_threshold))[
+        0]
 
     print('ok')
     # Create the filtered point cloud
@@ -535,15 +542,15 @@ def surface_from_image(data):
     channels = [red_channel, green_channel, blue_channel]
     pcds = []
 
-    for i,chan in enumerate(channels):
+    for i, chan in enumerate(channels):
         color_array = np.zeros((chan.shape[0], chan.shape[1], 3), dtype=np.float32)
 
         # Assign the red channel's intensity values to all three channels
-        color_array[:, :, 0] = 0.2*chan/255
-        color_array[:, :, 1] = 0.2*chan/255
-        color_array[:, :, 2] = 0.2*chan/255
+        color_array[:, :, 0] = 0.2 * chan / 255
+        color_array[:, :, 1] = 0.2 * chan / 255
+        color_array[:, :, 2] = 0.2 * chan / 255
 
-        color_array[:, :, i] = 0.6*chan/255
+        color_array[:, :, i] = 0.6 * chan / 255
 
         # color_array = np.transpose(color_array, (1, 0, 2))
         print(color_array.shape)
@@ -556,7 +563,7 @@ def surface_from_image(data):
         x = -x_coords.flatten()
         y = y_coords.flatten()
         z = chan.flatten()
-       # z = [i * Z_FACTOR for i in z]
+        # z = [i * Z_FACTOR for i in z]
 
         # Create the point cloud using the flattened arrays
         # compute how the range scales compared to x/y
@@ -566,7 +573,7 @@ def surface_from_image(data):
         pcd.points = o3d.utility.Vector3dVector(points)
 
         # get colors
-        color_array = color_array.reshape(width*height, 3)
+        color_array = color_array.reshape(width * height, 3)
         pcd.colors = o3d.utility.Vector3dVector(color_array)
 
         pcds.append(pcd)
