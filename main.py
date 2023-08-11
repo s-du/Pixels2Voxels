@@ -142,6 +142,13 @@ class Custom3dView:
         numlayout_min.add_child(gui.Label("Min. intensity.:"))
         numlayout_min.add_child(self.edit_min)
 
+        # background color
+        self.color_sel = gui.ColorEdit()
+        color_back = gui.Horiz(0, gui.Margins(0.25 * em, 0.25 * em, 0.25 * em, 0.25 * em))
+        color_back.add_child(gui.Label("Background color"))
+        color_back.add_child(self.color_sel)
+        self.color_sel.set_on_value_changed(self.change_back_col)
+
         # layout
         self.button_lay.add_child(self.load_but)
         view_ctrls.add_child(combo_channel)
@@ -152,6 +159,7 @@ class Custom3dView:
         view_ctrls.add_child(filter_but)
 
         view_ctrls.add_child(camera_but)
+        view_ctrls.add_child(color_back)
 
         self.layout.add_child(self.button_lay)
         self.layout.add_child(view_ctrls)
@@ -159,6 +167,9 @@ class Custom3dView:
 
         self.widget3d.set_on_mouse(self._on_mouse_widget3d)
         self.window.set_needs_layout()
+
+    def change_back_col(self, c):
+        self.widget3d.scene.set_background([c.red, c.green, c.blue, 1])
 
     def choose_material(self, is_enabled):
         pass
